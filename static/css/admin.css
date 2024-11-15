@@ -145,3 +145,11 @@ tbody tr:hover {
 .admin-actions a:hover {
     background-color: #45a049;
 }
+/* Add this CSS rule to your admin.css */
+.highlight-teacher {
+    background-color: #ffeb3b;  /* A yellow background for teacher's orders */
+    font-weight: bold;
+}
+.completed-order {
+    background-color: lightgreen; /* Background color for completed orders */
+}

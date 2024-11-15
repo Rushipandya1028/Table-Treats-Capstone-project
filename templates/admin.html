@@ -38,24 +38,58 @@
                 <th>Order Details</th>
                 <th>Total</th>
                 <th>Table Number</th>
+                <th>User Role</th> <!-- Add column for Role -->
+                <th>Status</th> <!-- Add a column for Status (checkbox) -->
             </tr>
         </thead>
         <tbody>
             {% for order in orders %}
-            <tr>
+            <tr class="
+                {% if order['role'] == 'admin' %}highlight-admin
+                {% elif order['role'] == 'user' %}highlight-user
+                {% elif order['role'] == 'teacher' %}highlight-teacher
+                {% endif %}
+            ">
                 <td>{{ loop.index }}</td>
                 <td>{{ order['order_time'] }}</td> <!-- Display Order Time -->
                 <td>{{ order['username'] }}</td>
                 <td>
                     {% for item in order['order_details']['items'] %}
-                    {{ item['name'] }}( quantity * {{ item['quantity'] }})<br>
+                    {{ item['name'] }} (Quantity: {{ item['quantity'] }})<br>
                     {% endfor %}
                 </td>
                 <td>{{ order['order_details']['total'] }}</td>
                 <td>{{ order['table_number'] }}</td>
+                <td>{{ order['role'] }}</td> <!-- Display the user role -->
+                <td>
+                    <!-- Add a checkbox to mark order as completed (toggle class for green) -->
+                    <input type="checkbox" class="order-complete" onclick="this.parentElement.parentElement.classList.toggle('completed')">
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <style>
+        /* Highlight admin rows with a special color */
+        .highlight-admin {
+            background-color: #e6f7ff; /* Light blue for admin */
+        }
+
+        /* Highlight user rows with a different color */
+        .highlight-user {
+            background-color: #fff0f0; /* Light red for user */
+        }
+
+        /* Highlight teacher rows with yellow */
+        .highlight-teacher {
+            background-color: #fff4b3; /* Light yellow for teacher */
+        }
+
+        /* Green color for completed orders */
+        .completed {
+            background-color: #0af641; /* Light green for completed orders */
+        }
+    </style>
 </body>
 </html>

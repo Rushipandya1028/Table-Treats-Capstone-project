@@ -1,58 +1,43 @@
+<!-- cart.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
+    <title>Cart</title>
     <link rel="stylesheet" href="/static/css/cart.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Shopping Cart</h1>
-        <div id="cart-items">
-            <!-- Cart items will be dynamically added here -->
-        </div>
-        <p>Total: <span id="cart-total">Rs 0.00</span></p>
-        <button onclick="checkout()">Checkout</button>
+    <h1>Your Cart</h1>
+
+    <div id="cart-items">
+        <!-- Cart items will be inserted here dynamically -->
     </div>
 
+    <button id="payment-btn">Proceed to Payment</button>
+
     <script>
-        // Sample cart items
-        const cartItems = [
-            { name: "Item 1", price: 10 },
-            { name: "Item 2", price: 20 },
-            { name: "Item 3", price: 15 }
-        ];
+        // Get the cart items from the URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const items = JSON.parse(urlParams.get('items'));
 
-        // Function to display cart items
-        function displayCart() {
-            const cartContainer = document.getElementById("cart-items");
-            let total = 0;
+        const cartItemsDiv = document.getElementById('cart-items');
+        
+        // Display the cart items
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'cart-item';
+            itemDiv.innerHTML = `${item.item} - $${item.price}`;
+            cartItemsDiv.appendChild(itemDiv);
+        });
 
-            // Clear previous items
-            cartContainer.innerHTML = '';
-
-            // Populate cart with items
-            cartItems.forEach(item => {
-                const itemElement = document.createElement("div");
-                itemElement.textContent = `${item.name} - Rs ${item.price.toFixed(2)}`;
-                cartContainer.appendChild(itemElement);
-                total += item.price;
-            });
-
-            // Update total
-            document.getElementById("cart-total").textContent = 'Rs ' + total.toFixed(2);
-        }
-
-        // Function to simulate checkout
-        function checkout() {
-            // Replace with actual checkout logic
-            alert('Checkout functionality to be implemented!');
-        }
-
-        // Call displayCart() when the page loads
-        window.onload = displayCart;
+        // Handle Payment Button click
+        document.getElementById('payment-btn').addEventListener('click', function() {
+            // Placeholder for now
+            alert("Proceeding to payment...");
+            // For now, we'll just redirect to a dummy page or a success page
+            window.location.href = '/payment';  // This could be your payment page later
+        });
     </script>
 </body>
 </html>

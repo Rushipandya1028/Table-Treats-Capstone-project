@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/login.css">
-    <title>Login</title>
+    <title>Teacher Login</title>
 </head>
 <body>
     <div class="login">
-        <h1>Login</h1>
-        <form action="{{ url_for('login') }}" method="POST">
+        <h1>Teacher Login</h1>
+        <form action="{{ url_for('teacher_login') }}" method="POST">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
 
@@ -18,17 +18,12 @@
 
             <button type="submit">Login</button>
         </form>
-        
+
         {% if error %}
             <p style="color: red;">{{ error }}</p>
         {% endif %}
         
-        <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
-
-        <!-- Teacher login section -->
-        <div class="teacher-login">
-            <p>Are you a teacher? <a href="{{ url_for('teacher_login') }}">Teacher Login</a></p>
-        </div>
+        <p>Back to <a href="{{ url_for('login') }}">Student Login</a></p>
     </div>
 </body>
 </html>

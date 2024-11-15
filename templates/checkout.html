@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Your Order</h1>
+
+    <table id="order-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Cart items will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <h3>Total Price: <span id="total-price">Rs. 0.00</span></h3>
+
+    <form action="#" method="POST"> <!-- Temporarily disabling form submission -->
+        <button type="submit">Proceed to Payment</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var cartItems = JSON.parse(sessionStorage.getItem("cartItems"));
+            
+            if (cartItems) {
+                var orderTableBody = document.querySelector("#order-table tbody");
+                var totalPrice = 0;
+
+                // Loop through the cart items and append them to the table
+                cartItems.forEach(function(item) {
+                    var row = document.createElement("tr");
+
+                    var itemName = document.createElement("td");
+                    itemName.textContent = item.name;
+
+                    var itemQuantity = document.createElement("td");
+                    itemQuantity.textContent = item.quantity;
+
+                    var itemPrice = document.createElement("td");
+                    itemPrice.textContent = "Rs. " + item.price.toFixed(2);
+
+                    var itemTotal = document.createElement("td");
+                    var totalItemPrice = (item.price * item.quantity).toFixed(2);
+                    itemTotal.textContent = "Rs. " + totalItemPrice;
+
+                    row.appendChild(itemName);
+                    row.appendChild(itemQuantity);
+                    row.appendChild(itemPrice);
+                    row.appendChild(itemTotal);
+
+                    orderTableBody.appendChild(row);
+
+                    // Add to total price
+                    totalPrice += item.price * item.quantity;
+                });
+
+                // Update the total price display
+                document.getElementById("total-price").textContent = "Rs. " + totalPrice.toFixed(2);
+            } else {
+                alert("Your cart is empty.");
+                window.location.href = "menu.html"; // Go back to menu page if no items in the cart
+            }
+        });
+    </script>
+</body>
+</html>
