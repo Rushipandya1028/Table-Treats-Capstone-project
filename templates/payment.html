@@ -3,12 +3,190 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
+    <title>TableTreats - Payment</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
-    <h1>Payment Page</h1>
-    <p>Your payment is being processed...</p>
-    <!-- You can integrate actual payment methods here later -->
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo-container">
+                <img src='/static/images/Screenshot 2024-02-01 114207.png' alt="TableTreats Logo">
+                <h2>TableTreats</h2>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('menu', table_number=table_number) }}">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('services', table_number=table_number) }}">
+                    <i class="fas fa-utensils"></i> Services
+                </a>
+                <a href="{{ url_for('contact', table_number=table_number) }}">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+                <a href="{{ url_for('about', table_number=table_number) }}">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="{{ url_for('cart', table_number=table_number) }}" class="active">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="location-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Table {{ table_number }}</span>
+                </div>
+                <h1>Payment Details</h1>
+            </header>
+
+            <div class="payment-page">
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="cart-items" id="cart-items">
+                        <!-- Cart items will be displayed here -->
+                    </div>
+                    <div class="order-total">
+                        <span>Total Amount:</span>
+                        <span id="cart-total">₹0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-section">
+                    <h2>Payment Information</h2>
+                    <div class="test-card-info">
+                        <h3>Test Card Details</h3>
+                        <p>Use these test card details for successful payment:</p>
+                        <ul>
+                            <li>Card Number: 4111 1111 1111 1111</li>
+                            <li>Expiry: Any future date (e.g., 12/25)</li>
+                            <li>CVV: Any 3 digits (e.g., 123)</li>
+                        </ul>
+                    </div>
+                    <button onclick="payNow()" class="pay-button">
+                        <i class="fas fa-lock"></i>
+                        Pay Now
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        var cartItems = [];
+        var totalAmount = 0;
+
+        // Load cart items from sessionStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCart = sessionStorage.getItem('cartItems');
+            if (savedCart) {
+                cartItems = JSON.parse(savedCart);
+                displayCart();
+            }
+        });
+
+        function displayCart() {
+            var cartList = document.getElementById('cart-items');
+            totalAmount = 0;
+
+            cartList.innerHTML = '';
+
+            cartItems.forEach(function(item) {
+                var itemElement = document.createElement('div');
+                itemElement.className = 'checkout-item';
+                itemElement.innerHTML = `
+                    <div class="item-details">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-quantity">x${item.quantity}</span>
+                    </div>
+                    <span class="item-price">₹${(item.price * item.quantity).toFixed(2)}</span>
+                `;
+                cartList.appendChild(itemElement);
+                totalAmount += item.price * item.quantity;
+            });
+
+            document.getElementById('cart-total').textContent = '₹' + totalAmount.toFixed(2);
+        }
+
+        function payNow() {
+            if (cartItems.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            // Calculate total amount
+            const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+            // Create order data
+            const orderData = {
+                amount: totalAmount * 100, // Convert to paise
+                items: cartItems,
+                table_number: "{{ table_number }}"
+            };
+
+            // Save order directly to database
+            fetch('/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                alert('Order placed successfully!');
+                window.location.href = "{{ url_for('menu', table_number=table_number) }}";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to create order. Please try again.');
+            });
+        }
+    </script>
+
+    <style>
+        .test-card-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .test-card-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .test-card-info p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .test-card-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .test-card-info li {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+    </style>
 </body>
 </html>

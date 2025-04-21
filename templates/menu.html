@@ -3,479 +3,347 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport"
-            content="width=device-width, initial-scale=1.0,viewport-fit=cover">
-        <title>Food Website</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TableTreats - Restaurant Menu</title>
         <link rel="stylesheet" href="/static/css/index.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
+        <div class="container">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar">
+                <div class="logo-container">
+                    <img src='/static/images/Screenshot 2024-02-01 114207.png' alt="TableTreats Logo">
+                    <h2>TableTreats</h2>
+                </div>
+                <div class="nav-links">
+                    <a href="{{ url_for('menu', table_number=table_number) }}" class="active">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <a href="{{ url_for('services', table_number=table_number) }}">
+                        <i class="fas fa-utensils"></i> Services
+                    </a>
+                    <a href="{{ url_for('contact', table_number=table_number) }}">
+                        <i class="fas fa-envelope"></i> Contact
+                    </a>
+                    <a href="{{ url_for('about', table_number=table_number) }}">
+                        <i class="fas fa-info-circle"></i> About
+                    </a>
+                    <a href="{{ url_for('cart', table_number=table_number) }}" class="cart-link">
+                        <i class="fas fa-shopping-cart"></i> Cart
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+                    {% if current_user.is_authenticated %}
+                <div class="sidebar-bottom">
+                    <div class="user-profile">
+                        <i class="fas fa-user"></i>
+                        <span>Hi, {{ current_user.username }}</span>
+                    </div>
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+                {% endif %}
+            </nav>
 
-        {% if current_user.is_authenticated %}
-        <a href="/logout">Logout</a>
-        {% endif %}
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="main-header">
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Table {{ table_number }}</span>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="search-input" placeholder="Search for dishes...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </header>
 
-        <!-- desktop view -->
-        <div class="container" id="container">
-            <div id="menu">
-                <div class="title">
-                    <img src='/static/images/Screenshot 2024-02-01 114207.png' alt = logo>
-                </div>
-                <div class="menu-item">
-                    <a href="{{ url_for('menu', table_number=table_number) }}">Home</a>
-                    <a href="{{ url_for('services', table_number=table_number) }}">Services</a>
+                <!-- Category Row -->
+                <div class="category-row">
+                    <div class="category-item">
+                        <i class="fas fa-utensils"></i>
+                        <span>Punjabi</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-pepper-hot"></i>
+                        <span>Gujarati</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-dragon"></i>
+                        <span>Chinese</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-pizza-slice"></i>
+                        <span>Italian</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-hamburger"></i>
+                        <span>Fast Food</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-ice-cream"></i>
+                        <span>Desserts</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-coffee"></i>
+                        <span>Beverages</span>
+                    </div>
+                    <div class="category-item">
+                        <i class="fas fa-seedling"></i>
+                        <span>Healthy</span>
+                    </div>
+                            </div>
 
-                    
-                    <a href="{{ url_for('contact', table_number=table_number) }}">Contact</a>
-                    <a href="{{ url_for('about', table_number=table_number) }}">About</a>
-                     <a href="/logout">Logout</a>
-                     <div class="rushi">
-                        {% if current_user.is_authenticated %}
-                        <p class="rushi1">Hi, {{ current_user.username }}</p>
-                          {% endif %}
-            
-                     </div>
-                       
-                    
-                    
+                <div class="menu-grid">
+                    <!-- Menu Items -->
+                    {% for item in menu_items %}
+                    <div class="menu-item" data-category="{{ item.category }}">
+                        <img src="{{ item.image_path }}" alt="{{ item.name }}">
+                        <div class="item-details">
+                            <div>
+                                <h3>{{ item.name }}</h3>
+                                <p class="price">₹{{ "%.2f"|format(item.price) }}</p>
+                                {% if item.description %}
+                                <p class="description">{{ item.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="item-actions">
+                                <div class="quantity-controls">
+                                    <button onclick="decreaseQuantity('{{ item.name }}')">-</button>
+                                    <span id="quantity_{{ item.name|replace(' ', '-') }}">0</span>
+                                    <button onclick="increaseQuantity('{{ item.name }}')">+</button>
+                                </div>
+                                <button class="add-btn" onclick="addToCart('{{ item.name }}', '{{ item.price }}', '{{ item.image_path }}')">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
-                
-            </div>
-         
-            <div id="food-container">
-                <div id="header">
-                    <div class="add-box">
-                        <i class="fa fa-map-marker your-address"
-                            id="add-address"> Anti Clock</i>
-                    </div>
-                    <div class="util">
-                        <input type="text"  id="search-input" onkeyup="searchItems()" placeholder="Search for items..."> 
-                    </div>
-                </div>
-                
-                <div id="food-items" class="d-food-items">
-               <div class="biryani">
-                
-              
-
-                <div class="item">
-                    <img src="/static/images/veg club.jpg" alt="Veg Club Sandwich" width="200" height="180">
-                    <p class="tital">Veg Club Sandwich</p>
-                    <p class="price">Rs.100</p>
-                    <button class="add" onclick="addToCart('Veg Club Sandwich', 100)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Veg Club Sandwich')" class="button1">-</button>
-                        <span id="quantity_Veg-Club-Sandwich" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Veg Club Sandwich')" class="button1">+</button>
-                    </div>
-                </div>
-                
-
-                <div class="item">
-                    <img src="/static/images/cheese masala dosa.jpg" alt="Cheese Masala Dosa" width="200" height="180">
-                    <p class="tital">Cheese Masala Dosa</p>
-                    <p class="price">Rs.160</p>
-                    <button class="add" onclick="addToCart('Cheese Masala Dosa', 160)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Cheese Masala Dosa')" class="button1">-</button>
-                        <span id="quantity_Cheese-Masala-Dosa" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Cheese Masala Dosa')" class="button1">+</button>
-                    </div>
-                </div>
-                
-
-                <div class="item">
-                    <img src="/static/images/margherita-pizza.jpg" alt="Margherita Pizza" width="200"  height="180">
-                    <p class="tital">Margherita Pizza</p>
-                    <p class="price">Rs.150</p>
-                    <button class="add" onclick="addToCart('Margherita Pizza', 150)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Margherita Pizza')" class="button1">-</button>
-                        <span id="quantity_Margherita-Pizza" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Margherita Pizza')" class="button1">+</button>
-                    </div>
-                </div>
-
-                <div class="item">
-                    <img src="/static/images/chinese/ChickenManchurian.jpg" alt="Manchurian" width="200"  height="180" >
-                    <p class="tital">Manchurian</p>
-                    <p class="price">Rs.180</p>
-                    <button class="add" onclick="addToCart('Manchurian', 180)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Manchurian')" class="button1">-</button>
-                        <span id="quantity_Manchurian" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Manchurian')" class="button1">+</button>
-                    </div>
-                </div>
-                
-             
-
-                <div class="item">
-                    <img src="/static/images/white-sauce-pasta-Autosaved-1536x1024.jpg" alt="White Sauce Pasta" width="200"  height="180">
-                    <p class="tital">White Sauce Pasta</p>
-                    <p class="price">Rs.200</p>
-                    <button class="add" onclick="addToCart('White Sauce Pasta', 200)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('White Sauce Pasta')" class="button1">-</button>
-                        <span id="quantity_White-Sauce-Pasta" class="quantity">0</span>
-                        <button onclick="increaseQuantity('White Sauce Pasta')" class="button1">+</button>
-                    </div>
-                </div>
-                
-
-                <div class="item">
-                    <img src="/static/images/garlic-noodles-31.jpg" alt="Noodles" width="200"  height="180">
-                    <p class="tital">Noodles</p>
-                    <p class="price">Rs.130</p>
-                    <button class="add" onclick="addToCart('Noodles', 130)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Noodles')" class="button1">-</button>
-                        <span id="quantity_Noodles" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Noodles')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/aloo parotha.jpg" alt="Aloo Paratha" width="200"  height="180">
-                    <p class="tital">Aloo Paratha</p>
-                    <p class="price">Rs.100</p>
-                    <button class="add" onclick="addToCart('Aloo Paratha', 100)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Aloo Paratha')" class="button1">-</button>
-                        <span id="quantity_Aloo-Paratha" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Aloo Paratha')" class="button1">+</button>
-                    </div>
-                </div>
-                
-
-                <div class="item">
-                    <img src="/static/images/samosa chat.jpg" alt="Samosa Chaat" width="200"  height="180">
-                    <p class="tital">Samosa Chaat</p>
-                    <p class="price">Rs.80</p>
-                    <button class="add" onclick="addToCart('Samosa Chaat', 80)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Samosa Chaat')" class="button1">-</button>
-                        <span id="quantity_Samosa-Chaat" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Samosa Chaat')" class="button1">+</button>
-                    </div>
-                </div>
-                
-
-                <div class="item">
-                    <img src="/static/images/khicadi.jpg" alt="Khichdi" width="200"  height="180">
-                    <p class="tital">Khichdi</p>
-                    <p class="price">Rs.90</p>
-                    <button class="add" onclick="addToCart('Khichdi', 90)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Khichdi')" class="button1">-</button>
-                        <span id="quantity_Khichdi" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Khichdi')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/Chilli-paneer-dry.jpg" alt="Paneer Chilli" width="200"  height="180">
-                    <p class="tital">Paneer Chilli</p>
-                    <p class="price">Rs.180</p>
-                    <button class="add" onclick="addToCart('Paneer Chilli', 180)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Paneer Chilli')" class="button1">-</button>
-                        <span id="quantity_Paneer-Chilli" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Paneer Chilli')" class="button1">+</button>
-                    </div>
-                </div>
-                <div class="item">
-                    <img src="/static/images/punjabi thali.jpeg" alt="Punjabi Thali" width="200" height="180">
-                    <p class="tital">Punjabi Thali</p>
-                    <p class="price">Rs.180</p>
-                    <button class="add" onclick="addToCart('Punjabi Thali', 180)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Punjabi Thali')" class="button1">-</button>
-                        <span id="quantity_Punjabi-Thali" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Punjabi Thali')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/gujrati thali.jpg" alt="Gujarati Thali" width="200" height="180">
-                    <p class="tital">Gujarati Thali</p>
-                    <p class="price">Rs.200</p>
-                    <button class="add" onclick="addToCart('Gujarati Thali', 200)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Gujarati Thali')" class="button1">-</button>
-                        <span id="quantity_Gujarati-Thali" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Gujarati Thali')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/pav bhaji.jpeg" alt="Pav Bhaji" width="200" height="180">
-                    <p class="tital">Pav Bhaji</p>
-                    <p class="price">Rs.150</p>
-                    <button class="add" onclick="addToCart('Pav Bhaji', 150)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Pav Bhaji')" class="button1">-</button>
-                        <span id="quantity_Pav-Bhaji" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Pav Bhaji')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/chole kulche.jpeg" alt="Chole Kulche" width="200" height="180">
-                    <p class="tital">Chole Kulche</p>
-                    <p class="price">Rs.120</p>
-                    <button class="add" onclick="addToCart('Chole Kulche', 120)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Chole Kulche')" class="button1">-</button>
-                        <span id="quantity_Chole-Kulche" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Chole Kulche')" class="button1">+</button>
-                    </div>
-                </div>
-                
-                <div class="item">
-                    <img src="/static/images/pulav.jpeg" alt="Pulav" width="200" height="180">
-                    <p class="tital">Pulav</p>
-                    <p class="price">Rs.140</p>
-                    <button class="add" onclick="addToCart('Pulav', 140)">Add to Cart</button>
-                    <div class="quantity-controls">
-                        <button onclick="decreaseQuantity('Pulav')" class="button1">-</button>
-                        <span id="quantity_Pulav" class="quantity">0</span>
-                        <button onclick="increaseQuantity('Pulav')" class="button1">+</button>
-                    </div>
-                </div>
-               </div>
-              </div>
-            </div>
-            
-            <div id="cart">
-                
-                <h2 class="biryani2">Let's Eat</h2>
-                <ul id="cart-items"></ul>
-                <p>Total: <span id="cart-total">Rs 0.00</span></p>
-                <button class="checkout" onclick="checkout()">Checkout</button>
-            
-           
-                
-            </div>
-        </div>
-
-        <!-- mobile view -->
-        <div id="mobile-view" class="mobile-view">
-            <div class="mobile-top">
-                <div class="logo-box">
-                    <img src="/images/foodielogo.png" alt id="logo">
-                    <i class="fa fa-map-marker your-address" id="m-add-address">
-                        Your Address</i>
-                </div>
-                <div class="top-menu">
-                    <i class="fa fa-search"></i>
-                    <i class="fa fa-tag"></i>
-                    <i class="fa fa-heart-o"></i>
-                    <i class="fa fa-cart-plus" id="m-cart-plus"> 0</i>
-                </div>
-            </div>
-
-            <div class="item-container">
-                <div class="category-header" id="category-header">
-                </div>
-
-                <div id="food-items" class="food-items">
-                    <div id="biryani" class="m-biryani">
-                        <p id="category-name">Biryani</p>
-                    </div>
-                    <div id="chicken" class="m-chicken">
-                        <p id="category-name">Chicken Delicious</p>
-                    </div>
-                    <div id="paneer" class="m-paneer">
-                        <p id="category-name">Paneer Mania</p>
-                    </div>
-                    <div id="vegetable" class="m-vegetable">
-                        <p id="category-name">Pure Veg Dishes</p>
-                    </div>
-                    <div id="chinese" class="m-chinese">
-                        <p id="category-name">Chinese Corner</p>
-                    </div>
-                    <div id="south-indian" class="m-south-indian">
-                        <p id="category-name">South Indian</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mobile-footer">
-                <p>Home</p>
-                <p>Cart</p>
-                <p>offers</p>
-                <p>orders</p>
-            </div>
+            </main>
         </div>
 
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var addToCartButtons = document.querySelectorAll('.add-to-cart');
+            var cartItems = [];
             
-            addToCartButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var name = button.getAttribute('data-name');
-                    var price = parseFloat(button.getAttribute('data-price'));
-                    addToCart(name, price);
-                });
-            });
-        });
-
-        var cartItems = [];
-
-        function addToCart(name, price) {
-            cartItems.push({ name: name, price: price });
-            displayCart();
-        }
-
-        function displayCart() {
-            var cartList = document.getElementById('cart-items');
-            var total = 0;
-
-            // Clear previous items
-            cartList.innerHTML = '';
-
-            // Populate cart with items
-            cartItems.forEach(function(item) {
-                var listItem = document.createElement('li');
-                listItem.textContent = item.name + ' - ' + item.price.toFixed(2);
-                cartList.appendChild(listItem);
-                total += item.price;
-            });
-
-            // Update total
-            document.getElementById('cart-total').textContent = 'Rs.' + total.toFixed(2);
-        }
-
-        function checkout() {
-            alert('Checkout functionality to be implemented!');
-        }
-    </script>
-        <script>
-            function checkout() {
-                // Prepare data to send
-                var orderDetails = {
-                    items: cartItems,
-                    total: document.getElementById('cart-total').textContent,
-                    table_number: "{{ table_number }}"  // Assuming you're passing the table number to the template
-                };
-            
-                // Send data to backend server
-                fetch('/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderDetails)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Display popup message
-                        alert('Order received!');
-            
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok.');
-                })
-                .then(data => {
-                    // Print the response from the server to the terminal
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error('There was a problem with your fetch operation:', error);
-                });
-            }   
-    </script>
-        <script>
-        var cartItems = [];
-
-        function addToCart(name, price) {
-            var itemIndex = cartItems.findIndex(item => item.name === name);
-            if (itemIndex !== -1) {
-                cartItems[itemIndex].quantity++;
-            } else {
-                cartItems.push({ name: name, price: price, quantity: 1 });
-            }
-            displayCart();
-        }
-
-        function displayCart() {
-            var cartList = document.getElementById('cart-items');
-            var total = 0;
-
-            // Clear previous items
-            cartList.innerHTML = '';
-
-            // Populate cart with items
-            cartItems.forEach(function(item) {
-                var listItem = document.createElement('li');
-                listItem.textContent = `${item.name} - Quantity: ${item.quantity} - Rs.${(item.price * item.quantity).toFixed(2)}`;
-                cartList.appendChild(listItem);
-                total += item.price * item.quantity;
-            });
-
-            // Update total
-            document.getElementById('cart-total').textContent = 'Rs.' + total.toFixed(2);
-        }
-        function increaseQuantity(name) {
-            var itemIndex = cartItems.findIndex(item => item.name === name);
-            if (itemIndex !== -1) {
-                cartItems[itemIndex].quantity++;
-                displayCart(); // Update the cart after increasing quantity
-                updateQuantityDisplay(name, cartItems[itemIndex].quantity); // Update quantity display
-                updateInitialQuantityDisplay(); // Update initial quantity display
-            }
-        }
-        
-        function decreaseQuantity(name) {
-            var itemIndex = cartItems.findIndex(item => item.name === name);
-            if (itemIndex !== -1 && cartItems[itemIndex].quantity > 0) {
-                cartItems[itemIndex].quantity--;
-                displayCart(); // Update the cart after decreasing quantity
-                updateQuantityDisplay(name, cartItems[itemIndex].quantity); // Update quantity display
-                updateInitialQuantityDisplay(); // Update initial quantity display
-            }
-        }
-        
-        function updateQuantityDisplay(name, quantity) {
-            // Find the corresponding quantity element by its ID and update its value
-            var quantityElement = document.getElementById('quantity_' + name.replace(/\s+/g, '-'));
-            if (quantityElement) {
-                quantityElement.textContent = quantity;
-            }
-        }
-        
-        function updateInitialQuantityDisplay() {
-            // Calculate the total quantity and update the initial quantity display
-            var totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
-            var initialQuantityElement = document.getElementById('initial-quantity');
-            if (initialQuantityElement) {
-                initialQuantityElement.textContent = totalQuantity;
-            }
-        }
-        
-    </script>
-    <script>
-        function searchItems() {
-            var input, filter, items, item, i, txtValue;
-            input = document.getElementById('search-input');
-            filter = input.value.toUpperCase();
-            items = document.getElementsByClassName('item');
-    
-            for (i = 0; i < items.length; i++) {
-                item = items[i];
-                txtValue = item.getElementsByClassName('tital')[0].textContent || item.getElementsByClassName('tital')[0].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    item.style.display = '';
+            // Load cart items from localStorage on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get valid cart items from server
+                const validCartItems = JSON.parse('{{ valid_cart_items|safe }}');
+                if (validCartItems && validCartItems.length > 0) {
+                    cartItems = validCartItems;
+                    localStorage.setItem('cartItems', JSON.stringify(cartItems));
                 } else {
-                    item.style.display = 'none';
+                    const savedCart = localStorage.getItem('cartItems');
+                if (savedCart) {
+                        const parsedCart = JSON.parse(savedCart);
+                        // Only load cart items if they belong to the current user
+                        if (parsedCart.userId === '{{ current_user.id if current_user.is_authenticated else "" }}') {
+                            cartItems = parsedCart.items;
+                        } else {
+                            cartItems = [];
+                            localStorage.removeItem('cartItems');
+                        }
+                    }
+                }
+                updateCartCount();
+                // Update button states for items in cart
+                updateButtonStates();
+                // Update quantity displays for all items
+                updateAllQuantityDisplays();
+
+                // Add click event listeners to category items
+                document.querySelectorAll('.category-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const category = this.querySelector('span').textContent;
+                        filterMenuItems(category);
+                        
+                        // Update active state
+                        document.querySelectorAll('.category-item').forEach(cat => {
+                            cat.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    });
+                });
+            });
+
+            function filterMenuItems(category) {
+                const menuItems = document.querySelectorAll('.menu-item');
+                menuItems.forEach(item => {
+                    if (category === 'All' || item.dataset.category === category) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+
+            function updateCartCount() {
+                const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    cartCount.textContent = totalItems;
                 }
             }
-        }
-    </script>
-    
+
+            function updateButtonStates() {
+                cartItems.forEach(item => {
+                    // Find all menu items
+                    const menuItems = document.querySelectorAll('.menu-item');
+                    menuItems.forEach(menuItem => {
+                        // Get the item name from the h3 element
+                        const itemName = menuItem.querySelector('h3').textContent;
+                        if (itemName === item.name) {
+                            const button = menuItem.querySelector('.add-btn');
+                            if (button) {
+                                button.textContent = 'Added!';
+                                button.style.backgroundColor = '#2ecc71';
+                            }
+                        }
+                    });
+                });
+            }
+
+            function updateAllQuantityDisplays() {
+                cartItems.forEach(item => {
+                    updateQuantityDisplay(item.name, item.quantity);
+                });
+            }
+
+            function updateQuantityDisplay(name, quantity) {
+                var quantityElement = document.getElementById('quantity_' + name.replace(/\s+/g, '-'));
+                if (quantityElement) {
+                    quantityElement.textContent = quantity;
+                }
+            }
+
+            function addToCart(name, price, image) {
+                const existingItem = cartItems.find(item => item.name === name);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cartItems.push({
+                        name: name,
+                        price: price,
+                        quantity: 1,
+                        image: image
+                    });
+                }
+                // Store cart with user ID
+                const cartData = {
+                    userId: '{{ current_user.id if current_user.is_authenticated else "" }}',
+                    items: cartItems
+                };
+                localStorage.setItem('cartItems', JSON.stringify(cartData));
+                updateCartCount();
+                updateButtonStates();
+                updateAllQuantityDisplays();
+            }
+
+            function increaseQuantity(name) {
+                var itemIndex = cartItems.findIndex(item => item.name === name);
+                if (itemIndex !== -1) {
+                    cartItems[itemIndex].quantity++;
+                    // Store cart with user ID
+                    const cartData = {
+                        userId: '{{ current_user.id if current_user.is_authenticated else "" }}',
+                        items: cartItems
+                    };
+                    localStorage.setItem('cartItems', JSON.stringify(cartData));
+                    updateCartCount();
+                    updateQuantityDisplay(name, cartItems[itemIndex].quantity);
+                }
+            }
+            
+            function decreaseQuantity(name) {
+                var itemIndex = cartItems.findIndex(item => item.name === name);
+                if (itemIndex !== -1 && cartItems[itemIndex].quantity > 0) {
+                    cartItems[itemIndex].quantity--;
+                    if (cartItems[itemIndex].quantity === 0) {
+                        cartItems.splice(itemIndex, 1);
+                        // Reset button state when item is removed
+                        const menuItems = document.querySelectorAll('.menu-item');
+                        menuItems.forEach(menuItem => {
+                            const itemName = menuItem.querySelector('h3').textContent;
+                            if (itemName === name) {
+                                const button = menuItem.querySelector('.add-btn');
+                                if (button) {
+                                    button.textContent = 'Add to Cart';
+                                    button.style.backgroundColor = '#3498db';
+                                }
+                            }
+                        });
+                    }
+                    // Store cart with user ID
+                    const cartData = {
+                        userId: '{{ current_user.id if current_user.is_authenticated else "" }}',
+                        items: cartItems
+                    };
+                    localStorage.setItem('cartItems', JSON.stringify(cartData));
+                    updateCartCount();
+                    updateQuantityDisplay(name, cartItems[itemIndex]?.quantity || 0);
+                }
+            }
+            
+            function displayCart() {
+                const cartContainer = document.getElementById('cart-items');
+                if (cartItems.length === 0) {
+                    cartContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                    return;
+                }
+
+                cartContainer.innerHTML = cartItems.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" class="item-image">
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <p class="price">₹${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                        <div class="quantity-controls">
+                            <button onclick="updateQuantity('${item.name}', ${item.quantity - 1})">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateQuantity('${item.name}', ${item.quantity + 1})">+</button>
+                            <button class="delete-btn" onclick="removeItem('${item.name}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function removeItem(name) {
+                cartItems = cartItems.filter(item => item.name !== name);
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                displayCart();
+                updateCartCount();
+                updateButtonStates();
+                updateAllQuantityDisplays();
+            }
+        </script>
+
+        <style>
+            /* Add these styles to your existing CSS */
+            .delete-btn {
+                background: #ff4444 !important;
+                color: white !important;
+                border: none !important;
+                padding: 5px 10px !important;
+                border-radius: 4px !important;
+                margin-left: 10px !important;
+                cursor: pointer !important;
+                transition: background-color 0.3s !important;
+            }
+
+            .delete-btn:hover {
+                background: #cc0000 !important;
+            }
+
+            .delete-btn i {
+                font-size: 14px;
+            }
+        </style>
     </body>
 </html>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/service.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="service-page">
+    <div class="service-header">
+        <h1>Our Services</h1>
+        <p>Discover our range of delicious treats and services</p>
+    </div>
+
+    <div class="service-grid">
+        <div class="service-card">
+            <div class="service-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <h3>Table Service</h3>
+            <p>Enjoy our premium table service with dedicated staff attending to your needs. Perfect for group gatherings and special occasions.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h3>Quick Service</h3>
+            <p>Fast and efficient service for those on the go. Order and receive your food quickly without compromising on quality.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Special Events</h3>
+            <p>Host your special events with us. We provide customized menus and dedicated service for your celebrations.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h3>Gift Cards</h3>
+            <p>Share the joy of good food with our gift cards. Perfect for any occasion and never expires.</p>
+        </div>
+    </div>
+
+    <div class="service-features">
+        <h2>Why Choose Us</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <h4>Quality Food</h4>
+                <p>Fresh ingredients and expertly prepared dishes</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <h4>Fast Service</h4>
+                <p>Quick and efficient order processing</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <h4>Clean Environment</h4>
+                <p>Maintained hygiene and comfortable seating</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <h4>Friendly Staff</h4>
+                <p>Professional and courteous service</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
